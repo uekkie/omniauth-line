@@ -28,11 +28,12 @@ module OmniAuth
       uid { raw_info['userId'] }
 
       info do
+        line_channel_secret = ENV.fetch('LINE_CHANNEL_SECRET', nil) 
         {
           name:        raw_info['displayName'],
           image:       raw_info['pictureUrl'],
           description: raw_info['statusMessage'],
-          email: JWT.decode(access_token['id_token'], ENV.fetch('LINE_CHANNEL_SECRET', nil), true, algorithm: 'HS256').first['email']
+          email: line_channel_secret ? JWT.decode(access_token['id_token'], line_channel_secret, true, algorithm: 'HS256').first['email'] : ''
         }
       end
 
