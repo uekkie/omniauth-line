@@ -28,7 +28,7 @@ module OmniAuth
       uid { raw_info['userId'] }
 
       info do
-        line_channel_secret = options.client_options
+        line_channel_secret = options.client_secret
         {
           name: raw_info['displayName'],
           image: raw_info['pictureUrl'],
