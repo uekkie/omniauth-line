@@ -24,16 +24,21 @@ module OmniAuth
         # Fixes regression in omniauth-oauth2 v1.4.0 by https://github.com/intridea/omniauth-oauth2/commit/85fdbe117c2a4400d001a6368cc359d88f40abc7
         options[:callback_url] || (full_host + callback_path)
       end
-      
+
       uid { raw_info['userId'] }
 
       info do
-        line_channel_secret = ENV.fetch('LINE_CHANNEL_SECRET', nil) 
+        line_channel_secret = options.client_secret
         {
-          name:        raw_info['displayName'],
-          image:       raw_info['pictureUrl'],
+          name: raw_info['displayName'],
+          image: raw_info['pictureUrl'],
           description: raw_info['statusMessage'],
-          email: line_channel_secret ? JWT.decode(access_token['id_token'], line_channel_secret, true, algorithm: 'HS256').first['email'] : ''
+          email: if line_channel_secret
+                   JWT.decode(access_token['id_token'], line_channel_secret, true,
+                              algorithm: 'HS256').first['email']
+                 else
+                   ''
+                 end
         }
       end
 
@@ -43,7 +48,6 @@ module OmniAuth
       rescue ::Errno::ETIMEDOUT
         raise ::Timeout::Error
       end
-
     end
   end
 end
